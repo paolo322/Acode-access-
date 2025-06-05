@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animal Friends Quiz 🐾</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Gochi+Hand&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: #FFF3E6;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        #quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        #start-btn {
+            font-size: 24px;
+            padding: 15px 30px;
+            background-color: #FF6B6B;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #start-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .question {
+            font-size: 24px;
+            color: #4A4A4A;
+            margin: 20px 0;
+        }
+
+        .answers {
+            display: grid;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .answer-btn {
+            font-size: 20px;
+            padding: 15px;
+            background-color: #4ECDC4;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .answer-btn:hover {
+            background-color: #45B7AF;
+        }
+
+        #timer {
+            font-size: 24px;
+            color: #FF6B6B;
+            margin: 15px 0;
+        }
+
+        #score {
+            font-family: 'Gochi Hand', cursive;
+            font-size: 32px;
+            color: #4ECDC4;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <h1>🐶 Animal Quiz Time! 🐱</h1>
+        <button id="start-btn">Start Quiz!</button>
+        <div id="timer">Time left: 60</div>
+        <div id="question-container" style="display: none;">
+            <div class="question" id="question"></div>
+            <div class="answers" id="answers"></div>
+        </div>
+        <div id="score"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Which animal says 'Moo'?",
+                answers: ["Pig", "Cow", "Duck", "Cat"],
+                correct: 1
+            },
+            {
+                question: "What do bees make?",
+                answers: ["Honey", "Cheese", "Bread", "Jam"],
+                correct: 0
+            },
+            {
+                question: "Which animal has a trunk?",
+                answers: ["Giraffe", "Elephant", "Hippo", "Zebra"],
+                correct: 1
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let timeLeft = 60;
+        let timerId;
+
+        document.getElementById('start-btn').addEventListener('click', startQuiz);
+
+        function startQuiz() {
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('question-container').style.display = 'block';
+            startTimer();
+            showQuestion();
+        }
+
+        function startTimer() {
+            timerId = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = `Time left: ${timeLeft}`;
+                if(timeLeft <= 0) endQuiz();
+            }, 1000);
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('question').textContent = question.question;
+            const answersDiv = document.getElementById('answers');
+            answersDiv.innerHTML = '';
+            
+            question.answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.textContent = answer;
+                button.classList.add('answer-btn');
+                button.addEventListener('click', () => checkAnswer(index));
+                answersDiv.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedIndex) {
+            if(selectedIndex === questions[currentQuestion].correct) {
+                score += 10;
+                document.getElementById('score').textContent = `Score: ${score} 🎉`;
+            }
+            
+            currentQuestion++;
+            if(currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            clearInterval(timerId);
+            document.getElementById('question-container').style.display = 'none';
+            document.getElementById('timer').textContent = "Time's up!";
+            document.getElementById('score').textContent = `Final Score: ${score} 🎉🎉`;
+        }
+    </script>
+</body>
+</html>
