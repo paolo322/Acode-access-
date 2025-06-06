@@ -1,170 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Animal Friends Quiz 🐾</title>
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Gochi+Hand&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Comic Neue', cursive;
-            background-color: #FFF3E6;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        #quiz-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-
-        #start-btn {
-            font-size: 24px;
-            padding: 15px 30px;
-            background-color: #FF6B6B;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        #start-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .question {
-            font-size: 24px;
-            color: #4A4A4A;
-            margin: 20px 0;
-        }
-
-        .answers {
-            display: grid;
-            gap: 15px;
-            margin: 30px 0;
-        }
-
-        .answer-btn {
-            font-size: 20px;
-            padding: 15px;
-            background-color: #4ECDC4;
-            color: white;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .answer-btn:hover {
-            background-color: #45B7AF;
-        }
-
-        #timer {
-            font-size: 24px;
-            color: #FF6B6B;
-            margin: 15px 0;
-        }
-
-        #score {
-            font-family: 'Gochi Hand', cursive;
-            font-size: 32px;
-            color: #4ECDC4;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vocabulary Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Baloo 2', cursive;
+      background: #fff0f5;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #ffeaf4;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #d2649a;
+    }
+    .question-slide {
+      display: none;
+    }
+    .active-slide {
+      display: block;
+    }
+    .question h3 {
+      color: #b35088;
+    }
+    label {
+      display: block;
+      padding: 6px 10px;
+      margin: 6px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    input[type="radio"] {
+      margin-right: 10px;
+    }
+    button {
+      background: #f78fb3;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.1em;
+      border-radius: 10px;
+      cursor: pointer;
+      color: white;
+      margin: 10px;
+    }
+    button:hover {
+      background: #ea6ca4;
+    }
+    #resultPage {
+      display: none;
+      text-align: center;
+    }
+    .correct {
+      background-color: #c8f7c5;
+    }
+    .incorrect {
+      background-color: #ffc9c9;
+    }
+    #progressBarContainer {
+      width: 100%;
+      background-color: #f4d1e3;
+      height: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+    #progressBar {
+      height: 100%;
+      background-color: #f78fb3;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    #timer {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      background: #f78fb3;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <div id="quiz-container">
-        <h1>🐶 Animal Quiz Time! 🐱</h1>
-        <button id="start-btn">Start Quiz!</button>
-        <div id="timer">Time left: 60</div>
-        <div id="question-container" style="display: none;">
-            <div class="question" id="question"></div>
-            <div class="answers" id="answers"></div>
-        </div>
-        <div id="score"></div>
+
+  <div class="container">
+    <div id="timer">Time Left: 05:00</div>
+    <h1>🌼 Vocabulary Quiz 🌼</h1>
+
+    <div id="progressBarContainer">
+      <div id="progressBar"></div>
     </div>
 
-    <script>
-        const questions = [
-            {
-                question: "Which animal says 'Moo'?",
-                answers: ["Pig", "Cow", "Duck", "Cat"],
-                correct: 1
-            },
-            {
-                question: "What do bees make?",
-                answers: ["Honey", "Cheese", "Bread", "Jam"],
-                correct: 0
-            },
-            {
-                question: "Which animal has a trunk?",
-                answers: ["Giraffe", "Elephant", "Hippo", "Zebra"],
-                correct: 1
-            }
-        ];
+    <div id="quizSlides"></div>
 
-        let currentQuestion = 0;
-        let score = 0;
-        let timeLeft = 60;
-        let timerId;
+    <div style="text-align:center;">
+      <button onclick="prevQuestion()" id="prevBtn" style="display:none;">Back</button>
+      <button onclick="nextQuestion()" id="nextBtn">Next</button>
+      <button onclick="submitQuiz()" id="submitBtn" style="display:none;">Submit</button>
+      <button onclick="resetQuiz()" id="resetBtn" style="display:none;">Reset</button>
+    </div>
 
-        document.getElementById('start-btn').addEventListener('click', startQuiz);
+    <div id="resultPage">
+      <h2>🎉 Your Results 🎉</h2>
+      <div id="result"></div>
+    </div>
+  </div>
 
-        function startQuiz() {
-            document.getElementById('start-btn').style.display = 'none';
-            document.getElementById('question-container').style.display = 'block';
-            startTimer();
-            showQuestion();
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    const questions = [
+      { q: 'What does "Spectacle" mean?', options: ["A small gathering", "A visually striking or grand event", "A type of musical performance", "A personal accessory"], answer: 1 },
+      { q: 'Someone who is "Charismatic" is:', options: ["Very tall and strong", "Full of anger and frustration", "Having a powerful charm or appeal", "Quiet and unnoticeable"], answer: 2 },
+      { q: '"Melodious" best describes something that is:', options: ["Harsh and unpleasant", "Sweet-sounding and musical", "Fast-paced and energetic", "Completely silent"], answer: 1 },
+      { q: 'If something is "Rhythmic", it:', options: ["Changes speed randomly", "Has a regular beat or pattern", "Is completely unpredictable", "Sounds like an echo"], answer: 1 },
+      { q: 'A "Resonant" sound is:', options: ["High-pitched and weak", "Short and abrupt", "Deep, clear, and echoing", "Soft and barely noticeable"], answer: 2 },
+      { q: 'A "Timid" person is usually:', options: ["Confident and outgoing", "Shy and lacking confidence", "Loud and aggressive", "Careless and clumsy"], answer: 1 },
+      { q: 'If something is being "Scrutinized", it is:', options: ["Praised publicly", "Ignored completely", "Watched or examined closely", "Rejected immediately"], answer: 2 },
+      { q: 'A "Captivating" performance is one that:', options: ["Puts people to sleep", "Is hard to hear", "Holds one’s attention in a fascinating way", "Lasts for only a minute"], answer: 2 },
+      { q: '"Uproarious" laughter means it is:', options: ["Fake and forced", "Very loud and full of joy", "Quiet and respectful", "Short and weak"], answer: 1 },
+      { q: 'To "Overcome" something means to:', options: ["Avoid it altogether", "Be defeated by it", "Conquer a challenge or fear", "Ignore it until it goes away"], answer: 2 }
+    ];
+
+    let currentSlide = 0;
+    let timer;
+    let timeLeft = 300; // 5 minutes
+
+    function renderSlides() {
+      const container = document.getElementById("quizSlides");
+      container.innerHTML = "";
+      questions.forEach((item, index) => {
+        const slide = document.createElement("div");
+        slide.className = "question-slide";
+        if (index === 0) slide.classList.add("active-slide");
+        slide.innerHTML = `
+          <div class="question">
+            <h3>${index + 1}. ${item.q}</h3>
+            ${item.options.map((opt, i) => `
+              <label id="q${index}-opt${i}">
+                <input type="radio" name="q${index}" value="${i}">
+                ${String.fromCharCode(65 + i)}) ${opt}
+              </label>`).join('')}
+          </div>
+        `;
+        container.appendChild(slide);
+      });
+    }
+
+    function updateProgressBar() {
+      const percent = ((currentSlide + 1) / questions.length) * 100;
+      document.getElementById("progressBar").style.width = `${percent}%`;
+    }
+
+    function showSlide(index) {
+      const slides = document.querySelectorAll(".question-slide");
+      slides.forEach(slide => slide.classList.remove("active-slide"));
+      slides[index].classList.add("active-slide");
+
+      document.getElementById("prevBtn").style.display = index > 0 ? "inline-block" : "none";
+      document.getElementById("nextBtn").style.display = index < questions.length - 1 ? "inline-block" : "none";
+      document.getElementById("submitBtn").style.display = index === questions.length - 1 ? "inline-block" : "none";
+
+      updateProgressBar();
+    }
+
+    function nextQuestion() {
+      if (currentSlide < questions.length - 1) {
+        currentSlide++;
+        showSlide(currentSlide);
+      }
+    }
+
+    function prevQuestion() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        showSlide(currentSlide);
+      }
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      questions.forEach((item, i) => {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        const correctLabel = document.getElementById(`q${i}-opt${item.answer}`);
+        if (selected) {
+          const selectedLabel = document.getElementById(`q${i}-opt${selected.value}`);
+          if (parseInt(selected.value) === item.answer) {
+            selectedLabel.classList.add("correct");
+            score++;
+          } else {
+            selectedLabel.classList.add("incorrect");
+            correctLabel.classList.add("correct");
+          }
+        } else {
+          correctLabel.classList.add("correct");
         }
+      });
 
-        function startTimer() {
-            timerId = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').textContent = `Time left: ${timeLeft}`;
-                if(timeLeft <= 0) endQuiz();
-            }, 1000);
-        }
+      document.getElementById("result").innerText = `You got ${score} out of ${questions.length} correct! 🎉`;
+      document.getElementById("resultPage").style.display = "block";
+      document.getElementById("resetBtn").style.display = "inline-block";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("submitBtn").style.display = "none";
+      clearInterval(timer);
+      confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
+    }
 
-        function showQuestion() {
-            const question = questions[currentQuestion];
-            document.getElementById('question').textContent = question.question;
-            const answersDiv = document.getElementById('answers');
-            answersDiv.innerHTML = '';
-            
-            question.answers.forEach((answer, index) => {
-                const button = document.createElement('button');
-                button.textContent = answer;
-                button.classList.add('answer-btn');
-                button.addEventListener('click', () => checkAnswer(index));
-                answersDiv.appendChild(button);
-            });
-        }
+    function resetQuiz() {
+      const inputs = document.querySelectorAll('input[type="radio"]');
+      inputs.forEach(input => input.checked = false);
+      const labels = document.querySelectorAll("label");
+      labels.forEach(label => label.classList.remove("correct", "incorrect"));
+      document.getElementById("resultPage").style.display = "none";
+      document.getElementById("resetBtn").style.display = "none";
+      currentSlide = 0;
+      timeLeft = 300;
+      showSlide(currentSlide);
+      updateTimerDisplay();
+      startTimer();
+    }
 
-        function checkAnswer(selectedIndex) {
-            if(selectedIndex === questions[currentQuestion].correct) {
-                score += 10;
-                document.getElementById('score').textContent = `Score: ${score} 🎉`;
-            }
-            
-            currentQuestion++;
-            if(currentQuestion < questions.length) {
-                showQuestion();
-            } else {
-                endQuiz();
-            }
+    function startTimer() {
+      timer = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          alert("⏰ Time's up! Submitting your quiz.");
+          submitQuiz();
         }
+      }, 1000);
+    }
 
-        function endQuiz() {
-            clearInterval(timerId);
-            document.getElementById('question-container').style.display = 'none';
-            document.getElementById('timer').textContent = "Time's up!";
-            document.getElementById('score').textContent = `Final Score: ${score} 🎉🎉`;
-        }
-    </script>
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      const seconds = (timeLeft % 60).toString().padStart(2, '0');
+      document.getElementById("timer").textContent = `Time Left: ${minutes}:${seconds}`;
+    }
+
+    renderSlides();
+    showSlide(currentSlide);
+    startTimer();
+  </script>
+
 </body>
 </html>
