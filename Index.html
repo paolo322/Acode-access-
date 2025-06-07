@@ -1,261 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Vocabulary Quiz</title>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Baloo 2', cursive;
-      background: #fff0f5;
       margin: 0;
-      padding: 0;
-      color: #333;
+      font-family: 'Comic Sans MS', cursive;
+      background-color: #d0f0fd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-    .container {
-      max-width: 700px;
-      margin: 40px auto;
-      background: #ffeaf4;
+
+    .quiz-container {
+      background-color: #e4f6fc;
       padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 25px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
       position: relative;
     }
-    h1, h2 {
-      text-align: center;
-      color: #d2649a;
+
+    h2 {
+      color: #1d7fab;
     }
-    .question-slide {
-      display: none;
+
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 20px;
     }
-    .active-slide {
+
+    .options button {
       display: block;
-    }
-    .question h3 {
-      color: #b35088;
-    }
-    label {
-      display: block;
-      padding: 6px 10px;
-      margin: 6px 0;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    input[type="radio"] {
-      margin-right: 10px;
-    }
-    button {
-      background: #f78fb3;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1.1em;
-      border-radius: 10px;
-      cursor: pointer;
-      color: white;
-      margin: 10px;
-    }
-    button:hover {
-      background: #ea6ca4;
-    }
-    #resultPage {
-      display: none;
-      text-align: center;
-    }
-    .correct {
-      background-color: #c8f7c5;
-    }
-    .incorrect {
-      background-color: #ffc9c9;
-    }
-    #progressBarContainer {
       width: 100%;
-      background-color: #f4d1e3;
-      height: 20px;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1em;
+      background-color: #a0dcf5;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .options button:hover {
+      background-color: #8cd1f0;
+    }
+
+    .result {
+      font-size: 1.5em;
+      color: #12698a;
+    }
+
+    .next-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4fa3d1;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 15px;
+      background-color: #bde8f9;
       border-radius: 10px;
       overflow: hidden;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
-    #progressBar {
+
+    .progress {
       height: 100%;
-      background-color: #f78fb3;
       width: 0%;
-      transition: width 0.3s;
+      background-color: #4fa3d1;
+      transition: width 0.5s;
     }
+
     #timer {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      background: #f78fb3;
-      color: white;
-      padding: 5px 12px;
-      border-radius: 10px;
       font-weight: bold;
+      color: #116d95;
+      margin-bottom: 10px;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 999;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div id="timer">Time Left: 05:00</div>
-    <h1>🌼 Vocabulary Quiz 🌼</h1>
+<canvas id="confetti-canvas"></canvas>
 
-    <div id="progressBarContainer">
-      <div id="progressBar"></div>
-    </div>
+<div class="quiz-container" id="quiz">
+  <h2>Vocabulary Quiz</h2>
+  <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
+  <div id="timer">Time left: 10s</div>
+  <div class="question" id="question">Loading...</div>
+  <div class="options" id="options"></div>
+</div>
 
-    <div id="quizSlides"></div>
+<script>
+const quizData = [
+  { question: "1. What does \"Spectacle\" mean?", options: ["A) A small gathering", "B) A visually striking or grand event", "C) A type of musical performance", "D) A personal accessory"], answer: 1 },
+  { question: "2. Someone who is \"Charismatic\" is:", options: ["A) Very tall and strong", "B) Full of anger and frustration", "C) Having a powerful charm or appeal", "D) Quiet and unnoticeable"], answer: 2 },
+  { question: "3. \"Melodious\" best describes something that is:", options: ["A) Harsh and unpleasant", "B) Sweet-sounding and musical", "C) Fast-paced and energetic", "D) Completely silent"], answer: 1 },
+  { question: "4. If something is \"Rhythmic\", it:", options: ["A) Changes speed randomly", "B) Has a regular beat or pattern", "C) Is completely unpredictable", "D) Sounds like an echo"], answer: 1 },
+  { question: "5. A \"Resonant\" sound is:", options: ["A) High-pitched and weak", "B) Short and abrupt", "C) Deep, clear, and echoing", "D) Soft and barely noticeable"], answer: 2 },
+  { question: "6. A \"Timid\" person is usually:", options: ["A) Confident and outgoing", "B) Shy and lacking confidence", "C) Loud and aggressive", "D) Careless and clumsy"], answer: 1 },
+  { question: "7. If something is being \"Scrutinized\", it is:", options: ["A) Praised publicly", "B) Ignored completely", "C) Watched or examined closely", "D) Rejected immediately"], answer: 2 },
+  { question: "8. A \"Captivating\" performance is one that:", options: ["A) Puts people to sleep", "B) Is hard to hear", "C) Holds one’s attention in a fascinating way", "D) Lasts for only a minute"], answer: 2 },
+  { question: "9. \"Uproarious\" laughter means it is:", options: ["A) Fake and forced", "B) Very loud and full of joy", "C) Quiet and respectful", "D) Short and weak"], answer: 1 },
+  { question: "10. To \"Overcome\" something means to:", options: ["A) Avoid it altogether", "B) Be defeated by it", "C) Conquer a challenge or fear", "D) Ignore it until it goes away"], answer: 2 }
+];
 
-    <div style="text-align:center;">
-      <button onclick="prevQuestion()" id="prevBtn" style="display:none;">Back</button>
-      <button onclick="nextQuestion()" id="nextBtn">Next</button>
-      <button onclick="submitQuiz()" id="submitBtn" style="display:none;">Submit</button>
-      <button onclick="resetQuiz()" id="resetBtn" style="display:none;">Reset</button>
-    </div>
+let currentQuestion = 0;
+let score = 0;
+let timer;
+let timeLeft = 10;
 
-    <div id="resultPage">
-      <h2>🎉 Your Results 🎉</h2>
-      <div id="result"></div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-  <script>
-    const questions = [
-      { q: 'What does "Spectacle" mean?', options: ["A small gathering", "A visually striking or grand event", "A type of musical performance", "A personal accessory"], answer: 1 },
-      { q: 'Someone who is "Charismatic" is:', options: ["Very tall and strong", "Full of anger and frustration", "Having a powerful charm or appeal", "Quiet and unnoticeable"], answer: 2 },
-      { q: '"Melodious" best describes something that is:', options: ["Harsh and unpleasant", "Sweet-sounding and musical", "Fast-paced and energetic", "Completely silent"], answer: 1 },
-      { q: 'If something is "Rhythmic", it:', options: ["Changes speed randomly", "Has a regular beat or pattern", "Is completely unpredictable", "Sounds like an echo"], answer: 1 },
-      { q: 'A "Resonant" sound is:', options: ["High-pitched and weak", "Short and abrupt", "Deep, clear, and echoing", "Soft and barely noticeable"], answer: 2 },
-      { q: 'A "Timid" person is usually:', options: ["Confident and outgoing", "Shy and lacking confidence", "Loud and aggressive", "Careless and clumsy"], answer: 1 },
-      { q: 'If something is being "Scrutinized", it is:', options: ["Praised publicly", "Ignored completely", "Watched or examined closely", "Rejected immediately"], answer: 2 },
-      { q: 'A "Captivating" performance is one that:', options: ["Puts people to sleep", "Is hard to hear", "Holds one’s attention in a fascinating way", "Lasts for only a minute"], answer: 2 },
-      { q: '"Uproarious" laughter means it is:', options: ["Fake and forced", "Very loud and full of joy", "Quiet and respectful", "Short and weak"], answer: 1 },
-      { q: 'To "Overcome" something means to:', options: ["Avoid it altogether", "Be defeated by it", "Conquer a challenge or fear", "Ignore it until it goes away"], answer: 2 }
-    ];
-
-    let currentSlide = 0;
-    let timer;
-    let timeLeft = 300; // 5 minutes
-
-    function renderSlides() {
-      const container = document.getElementById("quizSlides");
-      container.innerHTML = "";
-      questions.forEach((item, index) => {
-        const slide = document.createElement("div");
-        slide.className = "question-slide";
-        if (index === 0) slide.classList.add("active-slide");
-        slide.innerHTML = `
-          <div class="question">
-            <h3>${index + 1}. ${item.q}</h3>
-            ${item.options.map((opt, i) => `
-              <label id="q${index}-opt${i}">
-                <input type="radio" name="q${index}" value="${i}">
-                ${String.fromCharCode(65 + i)}) ${opt}
-              </label>`).join('')}
-          </div>
-        `;
-        container.appendChild(slide);
-      });
-    }
-
-    function updateProgressBar() {
-      const percent = ((currentSlide + 1) / questions.length) * 100;
-      document.getElementById("progressBar").style.width = `${percent}%`;
-    }
-
-    function showSlide(index) {
-      const slides = document.querySelectorAll(".question-slide");
-      slides.forEach(slide => slide.classList.remove("active-slide"));
-      slides[index].classList.add("active-slide");
-
-      document.getElementById("prevBtn").style.display = index > 0 ? "inline-block" : "none";
-      document.getElementById("nextBtn").style.display = index < questions.length - 1 ? "inline-block" : "none";
-      document.getElementById("submitBtn").style.display = index === questions.length - 1 ? "inline-block" : "none";
-
-      updateProgressBar();
-    }
-
-    function nextQuestion() {
-      if (currentSlide < questions.length - 1) {
-        currentSlide++;
-        showSlide(currentSlide);
-      }
-    }
-
-    function prevQuestion() {
-      if (currentSlide > 0) {
-        currentSlide--;
-        showSlide(currentSlide);
-      }
-    }
-
-    function submitQuiz() {
-      let score = 0;
-      questions.forEach((item, i) => {
-        const selected = document.querySelector(`input[name="q${i}"]:checked`);
-        const correctLabel = document.getElementById(`q${i}-opt${item.answer}`);
-        if (selected) {
-          const selectedLabel = document.getElementById(`q${i}-opt${selected.value}`);
-          if (parseInt(selected.value) === item.answer) {
-            selectedLabel.classList.add("correct");
-            score++;
-          } else {
-            selectedLabel.classList.add("incorrect");
-            correctLabel.classList.add("correct");
-          }
-        } else {
-          correctLabel.classList.add("correct");
-        }
-      });
-
-      document.getElementById("result").innerText = `You got ${score} out of ${questions.length} correct! 🎉`;
-      document.getElementById("resultPage").style.display = "block";
-      document.getElementById("resetBtn").style.display = "inline-block";
-      document.getElementById("nextBtn").style.display = "none";
-      document.getElementById("submitBtn").style.display = "none";
+function startTimer() {
+  timeLeft = 10;
+  document.getElementById("timer").innerText = `Time left: ${timeLeft}s`;
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = `Time left: ${timeLeft}s`;
+    if (timeLeft <= 0) {
       clearInterval(timer);
-      confetti({ particleCount: 100, spread: 60, origin: { y: 0.6 } });
+      nextQuestion();
     }
+  }, 1000);
+}
 
-    function resetQuiz() {
-      const inputs = document.querySelectorAll('input[type="radio"]');
-      inputs.forEach(input => input.checked = false);
-      const labels = document.querySelectorAll("label");
-      labels.forEach(label => label.classList.remove("correct", "incorrect"));
-      document.getElementById("resultPage").style.display = "none";
-      document.getElementById("resetBtn").style.display = "none";
-      currentSlide = 0;
-      timeLeft = 300;
-      showSlide(currentSlide);
-      updateTimerDisplay();
-      startTimer();
-    }
+function loadQuestion() {
+  const q = quizData[currentQuestion];
+  document.getElementById("question").innerText = q.question;
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+  updateProgress();
 
-    function startTimer() {
-      timer = setInterval(() => {
-        timeLeft--;
-        updateTimerDisplay();
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          alert("⏰ Time's up! Submitting your quiz.");
-          submitQuiz();
-        }
-      }, 1000);
-    }
+  q.options.forEach((opt, index) => {
+    const btn = document.createElement("button");
+    btn.innerText = opt;
+    btn.onclick = () => {
+      if (index === q.answer) score++;
+      clearInterval(timer);
+      nextQuestion();
+    };
+    optionsDiv.appendChild(btn);
+  });
 
-    function updateTimerDisplay() {
-      const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-      const seconds = (timeLeft % 60).toString().padStart(2, '0');
-      document.getElementById("timer").textContent = `Time Left: ${minutes}:${seconds}`;
-    }
+  startTimer();
+}
 
-    renderSlides();
-    showSlide(currentSlide);
-    startTimer();
-  </script>
+function updateProgress() {
+  const percent = ((currentQuestion) / quizData.length) * 100;
+  document.getElementById("progressBar").style.width = `${percent}%`;
+}
+
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion < quizData.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  clearInterval(timer);
+  updateProgress();
+  document.getElementById("quiz").innerHTML = `
+    <h2>🎉 Quiz Completed!</h2>
+    <p class="result">Your Score: ${score} / ${quizData.length}</p>
+    <button class="next-btn" onclick="location.reload()">Try Again</button>
+  `;
+  launchConfetti();
+}
+
+function launchConfetti() {
+  const canvas = document.getElementById("confetti-canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let particles = [];
+
+  for (let i = 0; i < 150; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 100,
+      color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+      tilt: Math.floor(Math.random() * 5) - 5
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    update();
+  }
+
+  function update() {
+    particles.forEach(p => {
+      p.y += 3;
+      p.x += Math.sin(p.d) * 2;
+      if (p.y > canvas.height) {
+        p.y = -10;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+  }
+
+  setInterval(draw, 20);
+}
+
+loadQuestion();
+</script>
 
 </body>
 </html>
